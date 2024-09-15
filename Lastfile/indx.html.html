@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+   
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modify PDF with Name</title>
+    
+    <script meta charset="UTF-8" src="https://unpkg.com/pdf-lib/dist/pdf-lib.js"     ></script>
+    
+    <style>
+        body {
+            
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            
+        }
+        input[type="text"] {
+
+        
+        padding: 10px;
+        margin: 10px;
+        font-size: 18px;
+        direction: rtl;  /* Right-to-left text direction for Arabic */
+        text-align: right;  /* Align text to the right */
+        }
+        
+        input[type="submit"] {
+            
+            padding: 30px;
+            margin: 10px;
+            direction: rtl;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="https://saaf.sa/ar/">
+        <img src="https://saaf.sa/ar/wp-content/uploads/2022/11/nlogo.png" alt="SAAF Logo" width="500" height="300">
+      </a>
+      
+    <h1>دعوة بطولة المنطقة الغربية والجنوبية بطولة</h1>
+    <form id="nameForm">
+        <label for="name">اكتب الاسم في الاسفل </label><br>
+        <input type="text" id="name" name="name" required><br><br>
+        <input type="submit" value="اضغط للتحميل">
+    </form>
+</div>
+
+<script>
+    document.getElementById("nameForm").addEventListener("submit", async function(event) {
+        event.preventDefault();  // Prevent form from submitting the traditional way
+        
+
+        // Get the name from input field
+        const name = document.getElementById("name").value;
+
+        // Load the existing PDF from the same directory
+        const existingPdfBytes = await fetch("myfile.pdf.pdf").then(res => res.arrayBuffer());
+
+        // Load the pdf-lib library
+        const { PDFDocument, rgb } = PDFLib;
+
+        // Load the existing PDF document into pdf-lib
+        const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
+        // Get the first page of the PDF
+        const pages = pdfDoc.getPages();
+        const firstPage = pages[0];
+
+        // Set up the font and size for the text
+        const { width, height } = firstPage.getSize();
+        firstPage.drawText(`Dear ${name},`, {
+            x: 350,
+            y: height - 410, // Adjust y-position according to your PDF layout
+            size: 24,
+            color: rgb(0, 0, 0),
+            
+        });
+
+        // Serialize the PDFDocument to bytes (Uint8Array)
+        const pdfBytes = await pdfDoc.save();
+
+        // Trigger the download of the modified PDF
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${name}_Invitation.pdf`;
+        link.click();
+        direction: rtl;
+    });
+</script>
+
+</body>
+</html>
